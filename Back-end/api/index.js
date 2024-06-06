@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 
 // Import routes
 import userRouter from "./routes/user.route.js";
@@ -20,11 +21,20 @@ mongoose
     console.log(err);
   });
 
+  
+
 // Create express app
 const app = express();
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+app.use(cors({
+  credentials:true,
+  // need to change the origin to the front-end url
+  origin: ['http://localhost:3001'],
+  })
+);
+
+app.listen(4000, () => {
+  console.log("Server is running on port 4000");
 });
 
 //allow to send the data as a json to the server.
