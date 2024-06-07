@@ -29,7 +29,7 @@ const app = express();
 app.use(cors({
   credentials:true,
   // need to change the origin to the front-end url
-  origin: ['http://localhost:3001'],
+  origin: ['http://localhost:5173'],
   })
 );
 
