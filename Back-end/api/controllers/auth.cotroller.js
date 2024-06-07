@@ -77,3 +77,46 @@ export const signin = async (req, res, next) => {
     next(err);
   }
 };
+
+export const googleAuth = async (req, res, next) => {
+  const { email, username } = req.body;
+
+  try{
+    // Find if the user exists
+    const user =  await User.findOne({email});
+    if(user){
+      //generate token
+      const token = jwt.sign({id:user._id},process.env.JWT_SECRET);
+
+      // hide the password from the response
+      const { password: pass, ...rest} = user._doc;
+
+      // send the response with cookie token
+      res.status(200).cookie('access_token',token,{httpOnly:true}).json(rest);
+    }else{
+
+      //create random password
+      const generatedPassword = Math.random().toString(36).slice(-8)+ Math.random().toString(36).slice(-8);
+
+      // hash the password
+      const hashpassword = bcryptjs.hashSync(generatedPassword, 12);
+      // create new user
+      const newUser =User({
+        username: username.toLowerCase().split(' ').join('')+ Math.random().toString(9).slice(-4), // To make sure create a uniqe name
+        email,
+        password: hashpassword,
+      });
+
+      await newUser.save();
+
+      //generate token
+      const token = jwt.sign({id:newUser._id},process.env.JWT_SECRET);
+      const {password, ...rest} = newUser._doc;
+      res.status(200).cookie('access_token',token,{httpOnly:true}).json(rest);
+    }
+
+  }catch(err){
+    console.log(err);
+  }
+
+}
