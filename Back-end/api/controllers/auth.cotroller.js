@@ -40,40 +40,41 @@ export const signup = async (req, res, next) => {
 };
 
 export const signin = async (req, res, next) => {
-  const {email,password}= req.body;
+  const { email, password } = req.body;
 
   //check the null values and empty strings
   if (!email || !password || email === "" || password === "") {
     next(errorHandler(400, "All fields are required"));
   }
 
-  try{
-    const validUser = await User.findOne({email});
+  try {
+    const validUser = await User.findOne({ email });
 
     //if user not found
-    if(!validUser){
+    if (!validUser) {
       return next(errorHandler(404, "User not found"));
     }
 
     //compare the password
-    const validPassword =  bcryptjs.compareSync(password,validUser.password);
+    const validPassword = bcryptjs.compareSync(password, validUser.password);
 
     //if password not matched
-    if(!validPassword){
+    if (!validPassword) {
       return next(errorHandler(400, "Invalid password"));
     }
 
     //generate token
-    const token = jwt.sign({id:validUser._id},process.env.JWT_SECRET);
+    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
 
     // hide the password from the response
-    const { password: pass, ...rest} = validUser._doc;
+    const { password: pass, ...rest } = validUser._doc;
 
     // send the response with cookie token
-    res.status(200).cookie('access_token',token,{httpOnly:true}).json(rest);
-
-  }catch(err){
-    
+    res
+      .status(200)
+      .cookie("access_token", token, { httpOnly: true })
+      .json(rest);
+  } catch (err) {
     next(err);
   }
 };
@@ -81,28 +82,34 @@ export const signin = async (req, res, next) => {
 export const googleAuth = async (req, res, next) => {
   const { email, username } = req.body;
 
-  try{
+  try {
     // Find if the user exists
-    const user =  await User.findOne({email});
-    if(user){
+    const user = await User.findOne({ email });
+    if (user) {
       //generate token
-      const token = jwt.sign({id:user._id},process.env.JWT_SECRET);
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
       // hide the password from the response
-      const { password: pass, ...rest} = user._doc;
+      const { password: pass, ...rest } = user._doc;
 
       // send the response with cookie token
-      res.status(200).cookie('access_token',token,{httpOnly:true}).json(rest);
-    }else{
-
+      res
+        .status(200)
+        .cookie("access_token", token, { httpOnly: true })
+        .json(rest);
+    } else {
       //create random password
-      const generatedPassword = Math.random().toString(36).slice(-8)+ Math.random().toString(36).slice(-8);
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
 
       // hash the password
       const hashpassword = bcryptjs.hashSync(generatedPassword, 12);
       // create new user
-      const newUser =User({
-        username: username.toLowerCase().split(' ').join('')+ Math.random().toString(9).slice(-4), // To make sure create a uniqe name
+      const newUser = User({
+        username:
+          username.toLowerCase().split(" ").join("") +
+          Math.random().toString(9).slice(-4), // To make sure create a uniqe name
         email,
         password: hashpassword,
       });
@@ -110,13 +117,22 @@ export const googleAuth = async (req, res, next) => {
       await newUser.save();
 
       //generate token
-      const token = jwt.sign({id:newUser._id},process.env.JWT_SECRET);
-      const {password, ...rest} = newUser._doc;
-      res.status(200).cookie('access_token',token,{httpOnly:true}).json(rest);
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, { httpOnly: true })
+        .json(rest);
     }
-
-  }catch(err){
-    console.log(err);
+  } catch (err) {
+    next(err);
   }
+};
 
-}
+export const signout = async (req, res, next) => {
+  try {
+    res.clearCookie("access_token").status(200).json("Signout successfully");
+  } catch (err) {
+    next(err);
+  }
+};
