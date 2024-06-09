@@ -2,9 +2,10 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import functions from "firebase-functions";
 
 // Import routes
-import userRouter from "./routes/user.route.js";
+
 import authRouter from "./routes/auth.route.js";
 
 dotenv.config();
@@ -28,7 +29,6 @@ const app = express();
 
 app.use(cors({
   credentials:true,
-  // need to change the origin to the front-end url
   origin: ['http://localhost:5173'],
   })
 );
@@ -40,7 +40,12 @@ app.listen(4000, () => {
 //allow to send the data as a json to the server.
 app.use(express.json());
 
-app.use('/api/user', userRouter);
+// Log incoming requests for debugging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
 app.use('/api/auth', authRouter);
 
 // add error handling middleware
@@ -53,4 +58,6 @@ app.use((err,req,res,next)=>{
       message
   });
 });
+
+export const api = functions.https.onRequest(app);
  

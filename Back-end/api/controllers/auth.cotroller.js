@@ -16,7 +16,13 @@ export const signup = async (req, res, next) => {
     password === ""
   ) {
     //use middleware to handle the error
-    next(errorHandler(400, "All fields are required"));
+    return next(errorHandler(400, "All fields are required"));
+  }
+
+  //check if user if already exists from email
+  const user = await User.findOne({email});
+  if(user){
+    return next(errorHandler(400, "User already exists, please sign in"));
   }
 
   // hash the password and confirmPassword
@@ -44,7 +50,7 @@ export const signin = async (req, res, next) => {
 
   //check the null values and empty strings
   if (!email || !password || email === "" || password === "") {
-    next(errorHandler(400, "All fields are required"));
+    return next(errorHandler(400, "All fields are required"));
   }
 
   try {
@@ -107,9 +113,7 @@ export const googleAuth = async (req, res, next) => {
       const hashpassword = bcryptjs.hashSync(generatedPassword, 12);
       // create new user
       const newUser = User({
-        username:
-          username.toLowerCase().split(" ").join("") +
-          Math.random().toString(9).slice(-4), // To make sure create a uniqe name
+        username:username,
         email,
         password: hashpassword,
       });
