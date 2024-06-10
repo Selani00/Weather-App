@@ -24,7 +24,6 @@ export const signup = async (req, res, next) => {
   if(user){
     return next(errorHandler(400, "User already exists, please sign in"));
   }
-
   // hash the password and confirmPassword
   const hashpassword = bcryptjs.hashSync(password, 12);
 
@@ -34,6 +33,8 @@ export const signup = async (req, res, next) => {
     email,
     password: hashpassword,
   });
+
+  
 
   // save user and return response
   try {
