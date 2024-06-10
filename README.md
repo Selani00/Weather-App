@@ -52,10 +52,10 @@ Why Node.js ?
  - Node.js is the backend runtime environment in the MERN stack. For real-time application node.js is good, because it can handle multiple simultaneous connections.
 
 Why Express.js ?
- - Express is Node.js web application framework. This make easier to build APIs and handle HTTP requests and responses efficiently.
+ - Express is Node.js web application framework. This makes it easier to build APIs and handle HTTP requests and responses efficiently.
 
 Why MongoDB ?
- - MongoDB is a NoSQL database that stores data in JSON format. This will store the use details and login credentials.
+ - MongoDB is a NoSQL database that stores data in JSON format. This will store the user details and login credentials.
 
 
 Dependencies Use
@@ -72,12 +72,12 @@ Dependencies Use
 
 ### Deployment process
 
-- Go to firebase project that we created for the google authentication. Enable the blaze plan.
+- Go to firebase project that we have created for the google authentication. Enable the blaze plan.
 - Login to the Firebase using CLI
 - Initialize firebase, select the suitables choices which it ask. Select the firebase project which we created for this project.
 - There is a folder automatically created in the root directory called functions. Go to the package.json file in it.
 - Copy the *engines* and two dependencies which are *firebase-admin* and *firebase-functions* and past them in the relavent places in the original package.json file
-- Install the it using *npm i*
+- Install them using *npm i*
 - Delete the functions folder
 - Go to firebase.json and make change the *source* as root (.)
 - Add the deploy scripts to the package.json (*"firebase deploy --only functions:api"*)
